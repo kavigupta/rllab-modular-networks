@@ -1,0 +1,20 @@
+<mujoco model="arm3d">
+    <compiler inertiafromgeom="true" angle="radian" coordinate="local" />
+    <option timestep="0.01" gravity="0 0 0" iterations="20" integrator="Euler" />
+
+    <default>
+        <joint armature='0.04' damping="1" limited="true"/>
+        <geom friction=".8 .1 .1" density="300" margin="0.002" condim="1" contype="1" conaffinity="1"/>
+    </default>
+
+    <worldbody>
+        {model}
+
+        {objects}
+    </worldbody>
+
+
+    <actuator>
+        {joints}
+    </actuator>
+</mujoco>

@@ -1,0 +1,40 @@
+<body name="palm" pos="-0.1 0 -0.2">
+    <geom type="capsule" fromto="0 -0.05 0 0 0.05 0" size="0.06"/>
+    <body name="proximal_1" pos="0 0 0">
+        <joint name="proximal_j_1" type="hinge" pos="0 0 0" axis="0 1 0" range="-2.5236 2.3963" damping="1.0" />
+        <geom type="capsule"  fromto="0 0 0 0.4 0 0" size="0.03" contype="1" conaffinity="1"/>
+        <body name="distal_1" pos="0.4 0 0">
+            <joint name="distal_j_1" type="hinge" pos="0 0 0" axis="0 1 0" range="-2.3213 2.3" damping="1.0"/>
+            {before_3d}
+            <joint name="distal_j_1_3d" type="hinge" pos="0 0 0" axis="0 0 1" range="-2.5236 2.3963" damping="1.0" />
+            {after_3d}
+            <geom type="capsule"  fromto="0 0 0 0.2 0 0" size="0.03" contype="1" conaffinity="1"/>
+            <body name="distal_2" pos="0.2 0 0">
+                <joint name="distal_j_2" type="hinge" pos="0 0 0" axis="0 1 0" range="-2.3213 2.3" damping="1.0"/>
+                <geom type="capsule" fromto="0 0 0 0.2 0 0" size="0.03" contype="1" conaffinity="1"/>
+                {before_4_link}
+                <body name="distal_3" pos="0.2 0 0">
+                    <joint name="distal_j_3" type="hinge" pos="0 0 0" axis="0 1 0" range="-2.3213 2.3" damping="1.0"/>
+                    <geom type="capsule" fromto="0 0 0 0.2 0 0" size="0.03" contype="1" conaffinity="1"/>
+                    {after_4_link}
+                    {before_5_link}
+                    <body name="distal_4" pos="0.2 0 0">
+                        <joint name="distal_j_4" type="hinge" pos="0 0 0" axis="0 1 0" range="-2.3213 2.3" damping="1.0"/>
+                        <geom type="capsule" fromto="0 0 0 0.2 0 0" size="0.03" contype="1" conaffinity="1"/>
+                        {after_5_link}
+                        <body name="end" pos="0.2 0 0">
+                            <site name="tip arm" pos="0.05 0 0" size="0.005" />
+                            <geom type="capsule" fromto="0 0 -0.1 0 0 0.1" size="0.02" contype="1" conaffinity="1" />
+                            <geom type="capsule" fromto="0 0 -0.1 0.1 0 -0.1" size="0.02" contype="1" conaffinity="1" />
+                            <geom type="capsule" fromto="0 0 0.1 0.1 0 0.1" size="0.02" contype="1" conaffinity="1" />
+                        </body>
+                      {before_5_link}
+                      </body>
+                      {after_5_link}
+                {before_4_link}
+                </body>
+                {after_4_link}
+            </body>
+        </body>
+    </body>
+</body>

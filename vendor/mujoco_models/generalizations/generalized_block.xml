@@ -1,0 +1,8 @@
+
+<body name="goal{color_name}" pos="{position}">
+    {before_slides}
+    <joint name="obj_{color_name}_y" type="slide" pos="0 0 0" axis="0 0 1" range="-10 10" damping="0.5"/>
+    <joint name="obj_{color_name}_x" type="slide" pos="0 0 0" axis="1 0 0" range="-10 10" damping="0.5"/>
+    {after_slides}
+    <geom rgba="{rgb} 1" type="box" size="0.05 0.05 0.05" density='0.00001' contype="{is_solid}" conaffinity="{is_solid}"/>
+</body>

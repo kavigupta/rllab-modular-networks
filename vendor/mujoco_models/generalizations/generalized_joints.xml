@@ -1,0 +1,12 @@
+<motor joint="proximal_j_1" ctrlrange="-2 2" ctrllimited="true"/>
+{before_3d}
+<motor joint="distal_j_1_3d" ctrlrange="-2 2" ctrllimited="true"/>
+{after_3d}
+<motor joint="distal_j_1" ctrlrange="-2 2" ctrllimited="true"/>
+<motor joint="distal_j_2" ctrlrange="-2 2" ctrllimited="true"/>
+{before_4_link}
+<motor joint="distal_j_3" ctrlrange="-2 2" ctrllimited="true"/>
+{after_4_link}
+{before_5_link}
+<motor joint="distal_j_4" ctrlrange="-2 2" ctrllimited="true"/>
+{after_5_link}
