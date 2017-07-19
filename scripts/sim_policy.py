@@ -2,6 +2,7 @@ import argparse
 
 import joblib
 import tensorflow as tf
+from pickle import dump
 
 from rllab.misc.console import query_yes_no
 from rllab.sampler.utils import rollout
@@ -15,6 +16,8 @@ if __name__ == "__main__":
                         help='Max length of rollout')
     parser.add_argument('--speedup', type=float, default=1,
                         help='Speedup')
+    parser.add_argument('--rollout', type=str, default=None,
+                        help='rollout locatino')
     args = parser.parse_args()
 
     # If the snapshot file use tensorflow, do:
@@ -27,6 +30,8 @@ if __name__ == "__main__":
         env = data['env']
         while True:
             path = rollout(env, policy, max_path_length=args.max_path_length,
-                           animated=True, speedup=args.speedup)
+                           animated=args.rollout is None, speedup=args.speedup)
+            with open(args.rollout, "wb") as f:
+                dump(path, f)
             if not query_yes_no('Continue simulation?'):
                 break
