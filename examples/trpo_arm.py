@@ -38,7 +38,8 @@ def run_task(env):
 environments = [env
                     for cls in (BlockPushEnv, ReachEnv)
                     for condition in range(len(ALL_CONDITIONS))
-                    for env in cls.all_envs(is_3d=True, condition=condition)]
+                    for num_links in (3, 4, 5)
+                    for env in cls.all_envs(is_3d=True, condition=condition, number_links=num_links)]
 
 np.random.shuffle(environments)
 

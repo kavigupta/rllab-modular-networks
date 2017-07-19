@@ -12,11 +12,11 @@ import math
 class ArmEnv(MujocoEnv, Serializable):
 
     ORI_IND = 3
-    number_links = 3
 
-    def __init__(self, is_3d, condition, *args, **kwargs):
+    def __init__(self, is_3d, condition, number_links, *args, **kwargs):
         self.is_3d = is_3d
         self.condition = condition
+        self.number_links = number_links
         super(ArmEnv, self).__init__(file_path=self.file, *args, **kwargs)
         Serializable.__init__(self, is_3d, *args, **kwargs)
 
@@ -63,4 +63,4 @@ class ArmEnv(MujocoEnv, Serializable):
         logger.record_tabular('StdForwardProgress', np.std(progs))
 
     def __str__(self):
-        return f"{self.description}_{self.condition}"
+        return f"{self.number_links}_{self.description}_{self.condition}"
