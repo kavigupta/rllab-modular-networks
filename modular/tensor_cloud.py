@@ -1,0 +1,58 @@
+
+import tensorflow as tf
+import numpy as np
+
+from component import Concatenation
+
+class TensorCloud:
+    @staticmethod
+    def product(first, second, concat_name, pred = lambda x, y: True):
+        concat = Concatenation(concat_name)
+        return TensorCloud({
+            (k1, k2) : concat(v1, v2)
+                for k1, v1 in first
+                for k2, v2 in second
+                    if pred(k1, k2)
+        })
+    @staticmethod
+    def input(size, name):
+        return TensorCloud({() : input_tensor(size, name)})
+    def __init__(self, params_to_tensor):
+        self.params_to_tensor = {(k,) : v for k, v in params_to_tensor.items()}
+    def __or__(self, nets):
+        if not isinstance(nets, dict):
+            nets = {() : nets}
+        values = {}
+        for net_spec, net in nets.items():
+            for params, tensor in self:
+                if isinstance(net, type(lambda: None)):
+                    net_to_use = net(params)
+                else:
+                    net_to_use = net
+                values[(params,) + (net_spec,)] = net_to_use(tensor)
+        return TensorCloud(values)
+    def __add__(self, other):
+        vals = {}
+        vals.update(dict(self))
+        vals.update(dict(other))
+        return TensorCloud(vals)
+    def __iter__(self):
+        return iter((simplify(x), y) for x, y in self.params_to_tensor.items())
+
+def input_tensor(size, name):
+    return tf.placeholder(np.float64, [size, 1], name=name)
+
+def flatten(tup):
+    result = ()
+    for x in tup:
+        if isinstance(x, tuple):
+            result += flatten(x)
+        else:
+            result = result + (x,)
+    return result
+
+def simplify(x):
+    x = flatten(x)
+    if len(x) == 1:
+        return x[0]
+    return x
