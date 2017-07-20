@@ -26,7 +26,7 @@ class BlockPushEnv(ArmEnv):
     def all_envs(*args, **kwargs):
         for moving in COLORS:
             for target in COLORS:
-                if moving != target:
+                if moving < target:
                     yield lambda moving=moving, target=target: BlockPushEnv(moving, target, *args, **kwargs)
 
     @property
