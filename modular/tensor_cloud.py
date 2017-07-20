@@ -13,29 +13,32 @@ class TensorCloud:
                 for k1, v1 in first
                 for k2, v2 in second
                     if pred(k1, k2)
-        })
+        }, first.components | second.components)
     @staticmethod
     def input(size, name):
         return TensorCloud({() : input_tensor(size, name)})
-    def __init__(self, params_to_tensor):
+    def __init__(self, params_to_tensor, components=set()):
         self.params_to_tensor = {(k,) : v for k, v in params_to_tensor.items()}
+        self.components = set(components)
     def __or__(self, nets):
         if not isinstance(nets, dict):
             nets = {() : nets}
         values = {}
+        all_nets = set()
         for net_spec, net in nets.items():
             for params, tensor in self:
                 if isinstance(net, type(lambda: None)):
                     net_to_use = net(params)
                 else:
                     net_to_use = net
+                all_nets |= {net_to_use}
                 values[(params,) + (net_spec,)] = net_to_use(tensor)
-        return TensorCloud(values)
+        return TensorCloud(values, self.components | all_nets)
     def __add__(self, other):
         vals = {}
         vals.update(dict(self))
         vals.update(dict(other))
-        return TensorCloud(vals)
+        return TensorCloud(vals, self.components | other.components)
     def __iter__(self):
         return iter((simplify(x), y) for x, y in self.params_to_tensor.items())
 
