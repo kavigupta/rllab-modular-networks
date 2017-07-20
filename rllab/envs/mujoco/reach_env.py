@@ -12,8 +12,11 @@ class ReachEnv(ArmEnv):
         Serializable.__init__(self, reach_block, *args, **kwargs)
 
     def cost(self, end_eff, block_locations):
-        target_loc = ALL_CONDITIONS[self.condition][self.reach_block]
-        return np.linalg.norm(end_eff - target_loc)
+        init_locs = ALL_CONDITIONS[self.condition]
+        target_loc = init_locs[self.reach_block]
+        blocks_unmoved_cost = sum(norm(block_locations[color] - init_locs[color])
+                                        for color in init_locs)
+        return np.linalg.norm(end_eff - target_loc) + blocks_unmoved_cost
 
     @staticmethod
     def all_envs(*args, **kwargs):
