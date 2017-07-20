@@ -1,5 +1,5 @@
 from rllab.envs.mujoco.arm_env import ArmEnv
-from vendor.mujoco_models.generalizations.generalize_model import COLORS, ALL_CONDITIONS
+from rllab.envs.mujoco.arm_env import COLORS, ALL_CONDITIONS
 from rllab.core.serializable import Serializable
 
 import numpy as np

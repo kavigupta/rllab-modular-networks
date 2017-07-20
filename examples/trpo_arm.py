@@ -12,7 +12,7 @@ from rllab.misc.instrument import run_experiment_lite
 
 import rllab.misc.logger as logger
 
-from vendor.mujoco_models.generalizations.generalize_model import COLORS, ALL_CONDITIONS
+from rllab.envs.mujoco.arm_env import COLORS, ALL_CONDITIONS
 
 parser = ArgumentParser()
 parser.add_argument('batch_size', type=str,

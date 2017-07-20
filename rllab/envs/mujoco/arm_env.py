@@ -3,11 +3,16 @@ from rllab.core.serializable import Serializable
 from rllab.envs.base import Step
 from rllab.misc.overrides import overrides
 from rllab.misc import logger
-from vendor.mujoco_models.generalizations.generalize_model import mujoco_xml, COLORS
+from vendor.mujoco_models.generalizations.generalize_model import mujoco_xml
 
 from rllab.envs.mujoco.mujoco_env import q_mult, q_inv
 import numpy as np
 import math
+from itertools import permutations
+
+COLORS = "red", "green", "yellow", "black"
+ALL_BLOCK_LOCATIONS = [[-0.4 + 0.7 * np.cos(theta), 0, -0.2 + 0.7 * np.sin(theta)] for theta in (-1.5, -1, -0.5, 0.5, 1, 1.5)]
+ALL_CONDITIONS = [dict(zip(COLORS, x)) for x in permutations(ALL_BLOCK_LOCATIONS, 4)]
 
 class ArmEnv(MujocoEnv, Serializable):
 
@@ -22,7 +27,7 @@ class ArmEnv(MujocoEnv, Serializable):
 
     @property
     def file(self):
-        return mujoco_xml(self.number_links, self.is_push, self.is_3d, self.condition)
+        return mujoco_xml(self.number_links, self.is_push, self.is_3d)
 
     def block_locations(self):
         return [self.get_body_com("goal%s" % color) for color in COLORS]
@@ -42,6 +47,12 @@ class ArmEnv(MujocoEnv, Serializable):
         ctrl_cost = 1e-2 * np.linalg.norm(action / (ub - lb))
         reward = - goal_cost - ctrl_cost
         return Step(self.get_current_obs(), float(reward), not np.isfinite(self._state).all())
+
+    @overrides
+    def reset_mujoco(self, init_state=None):
+        geom_pos = np.array(self.model.geom_pos)
+        geom_pos[-4:] = [ALL_CONDITIONS[self.condition][color] for color in COLORS]
+        self.model.geom_pos = geom_pos
 
     @overrides
     def get_ori(self):

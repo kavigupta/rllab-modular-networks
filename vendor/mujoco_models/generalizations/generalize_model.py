@@ -1,17 +1,9 @@
 
-from itertools import permutations
-
 import numpy as np
 from os import path, mkdir
 
 folder = path.dirname(__file__)
 build_folder = path.join(path.dirname(folder), "build_folder")
-
-ALL_BLOCK_LOCATIONS = [[-0.4 + 0.7 * np.cos(theta), 0, -0.2 + 0.7 * np.sin(theta)] for theta in (-1.5, -1, -0.5, 0.5, 1, 1.5)]
-
-COLORS = "red", "green", "yellow", "black"
-
-ALL_CONDITIONS = [dict(zip(COLORS, x)) for x in permutations(ALL_BLOCK_LOCATIONS, 4)]
 
 RGB = {
     "red" : [1, 0, 0],
@@ -48,13 +40,12 @@ def values(model_joints, objects):
     with open(path.join(folder, "color_blocks_generalized.xml")) as f:
         return f.read().format(model=model, objects="\n".join(objects), joints=joints)
 
-def mujoco_xml(links, is_push, is_3d, condition):
-    return "{build_folder}/{links}link_colors_{push_or_reach}{is_3d}_{condition}.xml".format(
+def mujoco_xml(links, is_push, is_3d):
+    return "{build_folder}/{links}link_colors_{push_or_reach}{is_3d}.xml".format(
                 build_folder=build_folder,
                 links=links,
                 push_or_reach="push" if is_push else "reach",
-                is_3d="_3d" if is_3d else "",
-                condition=condition)
+                is_3d="_3d" if is_3d else "")
 
 if __name__ == "__main__":
     try:
@@ -64,9 +55,8 @@ if __name__ == "__main__":
     for is_3d in True, False:
         for links in 3, 4, 5:
             for is_push in True, False:
-                for condition, block_locations in enumerate(ALL_CONDITIONS):
-                    xml = values(arm_joints(is_3d=is_3d, links=links), [block(color, movable=is_push, is_solid=is_push, location=block_locations[color])
-                                    for color in ("red", "green", "yellow", "black")])
-                    location = mujoco_xml(links, is_push, is_3d, condition)
-                    with open(location, "w") as f:
-                        f.write(xml)
+                xml = values(arm_joints(is_3d=is_3d, links=links), [block(color, movable=is_push, is_solid=is_push, location=[0, 0, 0])
+                                for color in ("red", "green", "yellow", "black")])
+                location = mujoco_xml(links, is_push, is_3d)
+                with open(location, "w") as f:
+                    f.write(xml)
