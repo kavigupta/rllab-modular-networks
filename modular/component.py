@@ -46,7 +46,14 @@ class Layer(Component):
     def run(self, arg):
         return tf.nn.relu(self.bias + tf.matmul(arg, self.layer, name="output"))
 
-class NetworkComponent(Component):
+class LayeredNetwork(Component):
+    def run(self, arg):
+        val = arg
+        for param in self.parameters:
+            val = param(val)
+        return val
+
+class NetworkComponent(LayeredNetwork):
     def __init__(self, name, start_dim, inter_sizes, output_size):
         super().__init__()
         self.name = name
@@ -55,11 +62,6 @@ class NetworkComponent(Component):
             for i, (prev, out) in enumerate(zip([start_dim] + inter_sizes, inter_sizes + [output_size])):
                 self.parameters.append(Layer(str(i), prev, out))
         self.scope = scope
-    def run(self, arg):
-        val = arg
-        for param in self.parameters:
-            val = param(val)
-        return val
 
 class Concatenation(Component):
     def __init__(self, name):
