@@ -1,5 +1,5 @@
 
-from component import NetworkComponent
+from component import FCNetwork
 from tensor_cloud import input_tensor, TensorCloud
 
 from functools import lru_cache
@@ -9,14 +9,14 @@ DIMENSIONS = 3
 
 def construct_network(hidden_size, number_layers):
     hidden_layers = [hidden_size] * number_layers
-    state_to_features = NetworkComponent("state_to_features", len(COLORS) * DIMENSIONS, hidden_layers, hidden_size)
+    state_to_features = FCNetwork("state_to_features", len(COLORS) * DIMENSIONS, hidden_layers, hidden_size)
     features_to_color = {
-        color : NetworkComponent(f"features_to_{color}", hidden_size, hidden_layers, hidden_size)
+        color : FCNetwork(f"features_to_{color}", hidden_size, hidden_layers, hidden_size)
             for color in COLORS
     }
-    reacher_to_protocol = NetworkComponent("reacher_to_protocol", hidden_size, hidden_layers, hidden_size)
-    pusher_to_protocol = NetworkComponent("blockpush_to_protocol", 2 * hidden_size, hidden_layers, hidden_size)
-    protocol_to_linker = lru_cache(None)(lambda links: NetworkComponent(
+    reacher_to_protocol = FCNetwork("reacher_to_protocol", hidden_size, hidden_layers, hidden_size)
+    pusher_to_protocol = FCNetwork("blockpush_to_protocol", 2 * hidden_size, hidden_layers, hidden_size)
+    protocol_to_linker = lru_cache(None)(lambda links: FCNetwork(
             f"protocol_to_{links}linker", hidden_size + 2 * DIMENSIONS * links, hidden_layers, DIMENSIONS * links)
     )
     state = TensorCloud.input(len(COLORS) * DIMENSIONS, "block_locations")

@@ -53,7 +53,7 @@ class LayeredNetwork(Component):
             val = param(val)
         return val
 
-class NetworkComponent(LayeredNetwork):
+class FCNetwork(LayeredNetwork):
     def __init__(self, name, start_dim, inter_sizes, output_size):
         super().__init__()
         self.name = name
