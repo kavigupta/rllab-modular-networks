@@ -43,7 +43,9 @@ class TensorCloud:
         return iter((simplify(x), y) for x, y in self.params_to_tensor.items())
 
 def input_tensor(size, name):
-    return tf.placeholder(np.float64, [size, 1], name=name)
+    if isinstance(size, int):
+        size = [size]
+    return tf.placeholder(np.float64, [1] + size, name=name)
 
 def flatten(tup):
     result = ()

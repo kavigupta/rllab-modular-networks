@@ -39,12 +39,12 @@ class Layer(Component):
         super().__init__()
         self.name = name
         with tf.variable_scope(self.name) as scope:
-            self.layer = tf.Variable(np.random.rand(output_size, start_size) - 0.5, name="layer")
-            self.bias = tf.Variable(-np.random.rand(output_size, 1))
+            self.layer = tf.Variable(np.random.rand(start_size, output_size) - 0.5, name="layer")
+            self.bias = tf.Variable(-np.random.rand(1, output_size))
             self.parameters = [Var(self.layer), Var(self.bias)]
         self.scope = scope
     def run(self, arg):
-        return tf.nn.relu(self.bias + tf.matmul(self.layer, arg, name="output"))
+        return tf.nn.relu(self.bias + tf.matmul(arg, self.layer, name="output"))
 
 class NetworkComponent(Component):
     def __init__(self, name, start_dim, inter_sizes, output_size):
@@ -69,4 +69,4 @@ class Concatenation(Component):
         with tf.name_scope(self.name) as scope:
             self.scope = scope
     def run(self, first, second):
-        return tf.concat([first, second], axis=0)
+        return tf.concat([first, second], axis=1)
