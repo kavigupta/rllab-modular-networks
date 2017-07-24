@@ -34,6 +34,8 @@ class TensorCloud:
                 all_nets |= {net_to_use}
                 values[(params,) + (net_spec,)] = net_to_use(tensor)
         return TensorCloud(values, self.components | all_nets)
+    def label(self, name):
+        return TensorCloud({k + (name,) : v for k, v in self.params_to_tensor.items()}, self.components)
     def __add__(self, other):
         vals = {}
         vals.update(dict(self))
