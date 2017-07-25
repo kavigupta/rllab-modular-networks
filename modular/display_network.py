@@ -17,7 +17,7 @@ def strip_consts(graph_def, max_const_size=32):
                 tensor.tensor_content = "<stripped %d bytes>"%size
     return strip_def
 
-def show_graph(max_const_size=32):
+def show_graph(max_const_size=32, path=None):
     """Visualize TensorFlow graph."""
     graph_def = tf.get_default_graph().as_graph_def()
     if hasattr(graph_def, 'as_graph_def'):
@@ -38,4 +38,9 @@ def show_graph(max_const_size=32):
     iframe = """
         <iframe seamless style="width:1200px;height:620px;border:0" srcdoc="{}"></iframe>
     """.format(code.replace('"', '&quot;'))
-    display(HTML(iframe))
+    result = iframe
+    if path is None:
+        display(HTML(result))
+    else:
+        with open(path, "w") as f:
+            f.write(result)
