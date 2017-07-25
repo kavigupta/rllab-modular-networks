@@ -1,6 +1,6 @@
 
-from component import FCNetwork, ImageNetwork
-from tensor_cloud import input_tensor, TensorCloud, Concatenation
+from component import FCNetwork, ImageNetwork, LayeredNetwork, Concatenation
+from tensor_cloud import input_tensor, TensorCloud
 
 from functools import lru_cache
 import numpy as np
@@ -39,9 +39,10 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
     images = TensorCloud.input([image_width, image_height, 3], "images")
     constant_features = constant_by_color | image_to_features
     features = (images | image_to_features).label("state") + (state | state_to_features).label("images")
-    color_locs = TensorCloud.product(features, constant_features, "features_with_image_label") | features_to_color
+    color_locs = TensorCloud.product(features, constant_features, Concatenation("features_with_image_label")) | features_to_color
     reach_protocol = color_locs | reacher_to_protocol
-    push_protocol = TensorCloud.product(color_locs, color_locs, "concat_push", lambda x, y: x < y) | pusher_to_protocol
-    robot_input = TensorCloud.product(push_protocol + reach_protocol, joint_angles, "concat_protocol_angles")
+    push_protocol = TensorCloud.product(color_locs, color_locs, Concatenation("concat_push"), lambda x, y: x < y) | pusher_to_protocol
+    protocol = push_protocol + reach_protocol
+    robot_input = TensorCloud.product(protocol, joint_angles, Concatenation("concat_protocol_angles"))
     output = robot_input | (lambda x: protocol_to_linker(x[-1]))
     return (images, state, joint_angles), output

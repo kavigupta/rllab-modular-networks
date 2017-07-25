@@ -6,8 +6,7 @@ from component import Concatenation
 
 class TensorCloud:
     @staticmethod
-    def product(first, second, concat_name, pred = lambda x, y: True):
-        concat = Concatenation(concat_name)
+    def product(first, second, concat, pred = lambda x, y: True):
         return TensorCloud({
             (k1, k2) : concat(v1, v2)
                 for k1, v1 in first
