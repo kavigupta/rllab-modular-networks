@@ -29,23 +29,26 @@ class ArmEnv(MujocoEnv, Serializable):
     @property
     def file(self):
         return mujoco_xml(self.number_links, self.is_push, self.is_3d)
-
+    @property
     def block_locations(self):
-        return [self.get_body_com("goal%s" % color) for color in COLORS]
+        return [self.block_location_dict[color] for color in COLORS]
+    @property
+    def block_location_dict(self):
+        return {color : self.get_body_com("goal%s" % color) + ALL_CONDITIONS[self.condition][color] for color in COLORS}
 
     def get_current_obs(self):
         return np.concatenate([
             self.model.data.qpos.flat,
             self.model.data.qvel.flat,
             self.get_body_com("end").flat
-        ] + self.block_locations()).reshape(-1)
+        ] + self.block_locations).reshape(-1)
 
     def step(self, action):
         if self.image_list is not None:
             self.image_list += [self.get_image()]
         self.forward_dynamics(action)
         end_eff = self.get_body_com("end")
-        goal_cost = self.cost(end_eff, {color : self.get_body_com("goal%s" % color) for color in COLORS})
+        goal_cost = self.cost(end_eff, self.block_location_dict)
         lb, ub = self.action_bounds
         ctrl_cost = 1e-2 * np.linalg.norm(action / (ub - lb))
         reward = - goal_cost - ctrl_cost
