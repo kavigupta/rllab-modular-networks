@@ -16,9 +16,11 @@ COLOR_DICTIONARY = {
 DIMENSIONS = 3
 
 def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, image_width, image_height, filter_size=4):
-    with tf.variable_scope("Constants"):
+    with tf.variable_scope("constant_colors"):
         constant_by_color = TensorCloud({
-            color : tf.constant(np.full((1, image_width, image_height, 3), np.array(COLOR_DICTIONARY[color], dtype=np.float64)), name=f"image_{color}")
+            color : tf.add(tf.constant(np.zeros((1, image_width, image_height, 3))),
+                           tf.constant(np.array(COLOR_DICTIONARY[color], dtype=np.float64)),
+                           name=f"image_{color}")
                 for color in COLORS
         })
     hidden_layers = [hidden_size] * number_layers
