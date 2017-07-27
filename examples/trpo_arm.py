@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 import sys
 import numpy as np
+import subprocess
 
 from rllab.algos.trpo import TRPO
 from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
@@ -13,6 +14,8 @@ from rllab.misc.instrument import run_experiment_lite
 import rllab.misc.logger as logger
 
 from rllab.envs.mujoco.arm_env import COLORS, ALL_CONDITIONS
+
+TRPO_INDEX = 0
 
 parser = ArgumentParser()
 parser.add_argument('batch_size', type=str,
@@ -43,12 +46,21 @@ environments = [env
 
 np.random.shuffle(environments)
 
-for env in environments:
+already_run = subprocess.run("ls data/local/experiment | cat", shell=True, stdout=subprocess.PIPE).stdout.decode().split('\n')
+
+def run_exp(env):
     env = env()
+    exp_name = f"trpo_{TRPO_INDEX}_{env}_{args.batch_size}"
+    if exp_name in already_run:
+        print("Skip %s" % exp_name)
+        return
     run_experiment_lite(
         lambda *_: run_task(env),
         n_parallel=10,
         snapshot_mode="last",
-        exp_name=f"{env}_{args.batch_size}",
+        exp_name=exp_name,
         seed=1
     )
+
+for env in environments:
+    run_exp(env)
