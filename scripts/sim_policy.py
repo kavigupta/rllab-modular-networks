@@ -28,10 +28,9 @@ if __name__ == "__main__":
         data = joblib.load(args.file)
         policy = data['policy']
         env = data['env']
-        while True:
-            path = rollout(env, policy, max_path_length=args.max_path_length,
-                           animated=args.rollout is None, speedup=args.speedup)
+        env.setup_camera()
+        path = rollout(env, policy, max_path_length=args.max_path_length,
+                       animated=True, speedup=args.speedup)
+        if args.rollout is not None:
             with open(args.rollout, "wb") as f:
-                dump(path, f)
-            if not query_yes_no('Continue simulation?'):
-                break
+                dump([path, env.image_list], f)

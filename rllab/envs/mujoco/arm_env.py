@@ -17,6 +17,7 @@ ALL_CONDITIONS = [dict(zip(COLORS, x)) for x in permutations(ALL_BLOCK_LOCATIONS
 class ArmEnv(MujocoEnv, Serializable):
 
     ORI_IND = 3
+    image_list = None
 
     def __init__(self, is_3d, condition, number_links, *args, **kwargs):
         self.is_3d = is_3d
@@ -40,6 +41,8 @@ class ArmEnv(MujocoEnv, Serializable):
         ] + self.block_locations()).reshape(-1)
 
     def step(self, action):
+        if self.image_list is not None:
+            self.image_list += [self.get_image()]
         self.forward_dynamics(action)
         end_eff = self.get_body_com("end")
         goal_cost = self.cost(end_eff, {color : self.get_body_com("goal%s" % color) for color in COLORS})
@@ -47,6 +50,10 @@ class ArmEnv(MujocoEnv, Serializable):
         ctrl_cost = 1e-2 * np.linalg.norm(action / (ub - lb))
         reward = - goal_cost - ctrl_cost
         return Step(self.get_current_obs(), float(reward), not np.isfinite(self._state).all())
+
+    def get_image(self):
+        data, width, height = self.get_viewer().get_image()
+        return np.fromstring(data, dtype='uint8').reshape(height, width, 3)[::-1,:,:]
 
     @overrides
     def reset_mujoco(self, init_state=None):
@@ -61,6 +68,11 @@ class ArmEnv(MujocoEnv, Serializable):
         ori = q_mult(q_mult(rot, ori), q_inv(rot))[1:3]  # project onto x-y plane
         ori = math.atan2(ori[1], ori[0])
         return ori
+
+    def setup_camera(self):
+        self.image_list = []
+        self.get_viewer().cam.distance = 3.5
+        self.get_viewer().cam.elevation = 0
 
     @overrides
     def log_diagnostics(self, paths):
