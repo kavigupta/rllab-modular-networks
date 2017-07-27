@@ -42,6 +42,8 @@ class TensorCloud:
         return TensorCloud(vals, self.components | other.components)
     def __iter__(self):
         return iter((simplify(x), y) for x, y in self.params_to_tensor.items())
+    def __repr__(self):
+        return f"TensorCloud({self.params_to_tensor}, {self.components})"
 
 def input_tensor(size, name):
     if isinstance(size, int):

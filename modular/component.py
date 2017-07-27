@@ -23,6 +23,8 @@ class Component:
             if args not in self.inputs_outputs:
                 self.inputs_outputs[args] = self.run(*args)
             return self.inputs_outputs[args]
+    def __repr__(self):
+        return f"<Component {type(self).__name__} {self.parameters}>"
 
 class Var(Component):
     def __init__(self, variable):
@@ -34,6 +36,8 @@ class Var(Component):
         sess.run(tf.assign(self.variable, values[self.variable.name]))
     def write(self, sess):
         yield (self.variable.name, sess.run(self.variable))
+    def __repr__(self):
+        return f"<Var {self.variable}>"
 
 class Layer(Component):
     def __init__(self, name, start_size, output_size):
@@ -46,6 +50,7 @@ class Layer(Component):
         self.scope = scope
     def run(self, arg):
         return tf.nn.relu(self.bias + tf.matmul(arg, self.layer, name="output"))
+
 class ConvLayer(Component):
     def __init__(self, name, in_width, in_height, filter_size, in_channels, out_channels, stride):
         super().__init__()
