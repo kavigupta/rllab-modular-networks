@@ -17,6 +17,7 @@ ALL_CONDITIONS = [dict(zip(COLORS, x)) for x in permutations(ALL_BLOCK_LOCATIONS
 class ArmEnv(MujocoEnv, Serializable):
 
     ORI_IND = 3
+    ctrl_coeff = 1e-2
     image_list = None
 
     def __init__(self, is_3d, condition, number_links, *args, **kwargs):
@@ -50,7 +51,7 @@ class ArmEnv(MujocoEnv, Serializable):
         end_eff = self.get_body_com("end")
         goal_cost = self.cost(end_eff, self.block_location_dict)
         lb, ub = self.action_bounds
-        ctrl_cost = 1e-2 * np.linalg.norm(action / (ub - lb))
+        ctrl_cost = self.ctrl_coeff * np.linalg.norm(action / (ub - lb))
         reward = - goal_cost - ctrl_cost
         return Step(self.get_current_obs(), float(reward), not np.isfinite(self._state).all())
 

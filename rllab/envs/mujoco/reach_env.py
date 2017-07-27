@@ -6,6 +6,7 @@ import numpy as np
 
 class ReachEnv(ArmEnv):
     is_push = True
+    ctrl_coeff = 1e-7
     def __init__(self, reach_block, *args, **kwargs):
         ArmEnv.__init__(self, *args, **kwargs)
         self.reach_block = reach_block
