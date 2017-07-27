@@ -92,7 +92,7 @@ class ConvNetwork(LayeredNetwork):
 
 def flatten(arg):
     first, *rest = (x.value for x in arg.shape)
-    return tf.reshape(arg, [first, reduce(mul, rest)])
+    return tf.reshape(arg, [first if first is not None else -1, reduce(mul, rest)])
 
 class ImageNetwork(LayeredNetwork):
     def __init__(self, name, in_width, in_height, filter_size, channel_sizes, output_channels, stride, hidden_layers, hidden_size):
@@ -111,7 +111,8 @@ class Concatenation(Component):
         with tf.name_scope(self.name) as scope:
             self.scope = scope
     def run(self, first, second):
-        return tf.concat([first, second], axis=1)
+        shaped_second = tf.tile(second, [tf.shape(first)[0], 1])
+        return tf.concat([first, shaped_second], axis=1)
 
 class Addition(Component):
     def __init__(self, name):

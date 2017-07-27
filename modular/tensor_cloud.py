@@ -46,7 +46,7 @@ class TensorCloud:
 def input_tensor(size, name):
     if isinstance(size, int):
         size = [size]
-    return tf.placeholder(np.float64, [1] + size, name=name)
+    return tf.placeholder(np.float64, [None] + size, name=name)
 
 def flatten(tup):
     result = ()
