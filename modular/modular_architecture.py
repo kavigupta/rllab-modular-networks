@@ -34,7 +34,7 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
     reacher_to_protocol = FCNetwork("reacher_to_protocol", hidden_size, hidden_layers, hidden_size)
     pusher_to_protocol = FCNetwork("blockpush_to_protocol", 2 * hidden_size, hidden_layers, hidden_size)
     protocol_to_linker = lru_cache(None)(lambda links: FCNetwork(
-            f"protocol_to_{links}linker", hidden_size + 2 * DIMENSIONS * links, hidden_layers, DIMENSIONS * links)
+            f"protocol_to_{links}linker", hidden_size + 2 * (links + 1), hidden_layers, 1 + links)
     )
     def reshape_into_image(arg):
         return tf.reshape(arg, [-1, image_width, image_height, 3])
@@ -42,7 +42,7 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
                                            lambda: FCNetwork("protocol_to_end_delta", hidden_size, hidden_layers, image_width * image_height * 3),
                                            lambda: reshape_into_image)
     state = TensorCloud.input(len(COLORS) * DIMENSIONS, "block_locations")
-    joint_angles = TensorCloud({links : input_tensor(2 * DIMENSIONS * links, "joint_angles_%s" % links) for links in (3, 4, 5)})
+    joint_angles = TensorCloud({links : input_tensor(2 * (links + 1), "joint_angles_%s" % links) for links in (3, 4, 5)})
     images = TensorCloud.input([image_width, image_height, 3], "images")
     constant_features = constant_by_color | image_to_features
     features = (images | image_to_features).label("state") + (state | state_to_features).label("images")

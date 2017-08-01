@@ -30,6 +30,11 @@ class ArmEnv(MujocoEnv, Serializable):
     @property
     def file(self):
         return mujoco_xml(self.number_links, self.is_push, self.is_3d)
+
+    @property
+    def n_joints(self):
+        return self.is_3d + self.number_links
+
     @property
     def block_locations(self):
         return [self.block_location_dict[color] for color in COLORS]
