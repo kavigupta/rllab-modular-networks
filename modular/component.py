@@ -145,3 +145,13 @@ class Addition(Component):
             self.scope = scope
     def run(self, first, second):
         return tf.add(first, second)
+
+class Loss(Component):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+        self.parameters = []
+        with tf.name_scope(self.name) as scope:
+            self.scope = scope
+    def run(self, first, second):
+        return tf.nn.l2_loss(first - second)

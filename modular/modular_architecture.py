@@ -45,6 +45,8 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
     state = TensorCloud.input(len(COLORS) * DIMENSIONS, "block_locations")
     joint_angles = TensorCloud({links : input_tensor(2 * (links + 1), "joint_angles_%s" % links) for links in (3, 4, 5)})
     images = TensorCloud.input([image_width, image_height, 3], "images")
+    label_joint = TensorCloud({links : input_tensor(links + 1, f"labels_joint_angles_{links}") for links in (3, 4, 5)})
+    label_end_image = TensorCloud.input([image_width, image_height, 3], "label_last_image")
     constant_features = constant_by_color | image_to_features
     features = (images | image_to_features).label("state") + (state | state_to_features).label("images")
     color_locs = TensorCloud.product(features, constant_features, Concatenation("features_with_image_label")) | features_to_color
@@ -54,4 +56,9 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
     robot_input = TensorCloud.product(protocol, joint_angles, Concatenation("concat_protocol_angles"))
     output = robot_input | (lambda x: protocol_to_linker(x[-1]))
     end_image = TensorCloud.product(protocol | protocol_to_end_delta, images, Addition("end_image"))
-    return (images, state, joint_angles), (output, end_image)
+    with tf.variable_scope("loss"):
+        pred = lambda x, y: x == y[-1]
+        key_combiner = lambda x, y: y
+        loss_joint = TensorCloud.product(label_joint, output, Loss("loss_joint"), pred, key_combiner)
+        loss_image = TensorCloud.product(label_end_image, end_image, Loss("loss_image"))
+    return (images, state, joint_angles), (output, end_image), (label_joint, label_end_image), (loss_joint, loss_image)
