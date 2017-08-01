@@ -39,13 +39,16 @@ class Var(Component):
     def __repr__(self):
         return f"<Var {self.variable}>"
 
+def gen_variable(*dims):
+    return np.array(np.random.rand(*dims), dtype=np.float32)
+
 class Layer(Component):
     def __init__(self, name, start_size, output_size):
         super().__init__()
         self.name = name
         with tf.variable_scope(self.name) as scope:
-            self.layer = tf.Variable(np.random.rand(start_size, output_size) - 0.5, name="layer")
-            self.bias = tf.Variable(-np.random.rand(1, output_size))
+            self.layer = tf.Variable(gen_variable(start_size, output_size) - 0.5, name="layer")
+            self.bias = tf.Variable(-gen_variable(1, output_size))
             self.parameters = [Var(self.layer), Var(self.bias)]
         self.scope = scope
     def run(self, arg):
@@ -57,8 +60,8 @@ class ConvLayer(Component):
         self.name = name
         self.stride = stride
         with tf.variable_scope(self.name) as scope:
-            self.filter = tf.Variable(np.random.rand(filter_size, filter_size, in_channels, out_channels))
-            self.bias = tf.Variable(np.random.rand(in_width, in_height, 1))
+            self.filter = tf.Variable(gen_variable(filter_size, filter_size, in_channels, out_channels))
+            self.bias = tf.Variable(gen_variable(in_width, in_height, 1))
             self.parameters = [Var(self.filter), Var(self.bias)]
         self.scope = scope
     def run(self, arg):
