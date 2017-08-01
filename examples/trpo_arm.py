@@ -20,7 +20,7 @@ parser.add_argument('batch_size', type=str,
                     help='size of the batch, in units of 10k')
 args = parser.parse_args(sys.argv[1:])
 
-def run_task(env):
+def run_task(env, max_path_length=150, n_itr=100, step_size=1e-3, batch_size=10**4):
     policy = GaussianMLPPolicy(
         env_spec=env.spec,
     )
@@ -29,10 +29,10 @@ def run_task(env):
         env=env,
         policy=policy,
         baseline=baseline,
-        max_path_length=150,
-        n_itr=100,
-        step_size=1e-3,
-        batch_size=int(float(args.batch_size) * 10**4)
+        max_path_length=max_path_length,
+        n_itr=n_itr,
+        step_size=step_size,
+        batch_size=batch_size
     )
     algo.train()
 
@@ -53,7 +53,7 @@ def run_exp(env):
         print("Skip %s" % exp_name)
         return
     run_experiment_lite(
-        lambda *_: run_task(env),
+        lambda *_: run_task(env, batch_size=int(float(args.batch_size) * 10**4)),
         n_parallel=10,
         snapshot_mode="last",
         exp_name=exp_name,
