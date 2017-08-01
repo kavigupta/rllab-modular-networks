@@ -15,8 +15,6 @@ import rllab.misc.logger as logger
 
 from rllab.envs.mujoco.arm_env import COLORS, ALL_CONDITIONS
 
-TRPO_INDEX = 0
-
 parser = ArgumentParser()
 parser.add_argument('batch_size', type=str,
                     help='size of the batch, in units of 10k')
@@ -31,15 +29,15 @@ def run_task(env):
         env=env,
         policy=policy,
         baseline=baseline,
-        max_path_length=300,
+        max_path_length=150,
         n_itr=100,
-        step_size=1e-2,
+        step_size=1e-3,
         batch_size=int(float(args.batch_size) * 10**4)
     )
     algo.train()
 
 environments = [env
-                    for cls in (BlockPushEnv, ReachEnv)
+                    for cls in (ReachEnv,)
                     for condition in range(len(ALL_CONDITIONS))
                     for num_links in (3, 4, 5)
                     for env in cls.all_envs(is_3d=True, condition=condition, number_links=num_links)]
@@ -50,7 +48,7 @@ already_run = subprocess.run("ls data/local/experiment | cat", shell=True, stdou
 
 def run_exp(env):
     env = env()
-    exp_name = f"trpo_{TRPO_INDEX}_{env}_{args.batch_size}"
+    exp_name = f"trpo_{env}_{args.batch_size}"
     if exp_name in already_run:
         print("Skip %s" % exp_name)
         return
