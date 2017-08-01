@@ -28,9 +28,10 @@ if __name__ == "__main__":
         data = joblib.load(args.file)
         policy = data['policy']
         env = data['env']
+        env.image_list = []
         env.setup_camera()
         path = rollout(env, policy, max_path_length=args.max_path_length,
-                       animated=True, speedup=args.speedup)
+                       animated=True, speedup=args.speedup, always_return_paths=True)
         if args.rollout is not None:
             with open(args.rollout, "wb") as f:
                 dump([path, env.image_list], f)
