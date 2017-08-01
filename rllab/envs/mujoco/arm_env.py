@@ -37,6 +37,10 @@ class ArmEnv(MujocoEnv, Serializable):
     def block_location_dict(self):
         return {color : self.get_body_com("goal%s" % color) + ALL_CONDITIONS[self.condition][color] for color in COLORS}
 
+    @property
+    def tensorcloud_key(self):
+        return self.task_type_key + (self.number_links,)
+
     def get_current_obs(self):
         return np.concatenate([
             self.model.data.qpos.flat,

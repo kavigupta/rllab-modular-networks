@@ -21,6 +21,10 @@ class ReachEnv(ArmEnv):
         dist = norm(end_eff - target_loc)
         return dist + blocks_unmoved_cost * self.unmoved_coeff
 
+    @property
+    def task_type_key(self):
+        return self.reach_block,
+
     @staticmethod
     def all_envs(*args, **kwargs):
         for color in COLORS:
