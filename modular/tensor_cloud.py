@@ -6,9 +6,9 @@ from modular.component import Concatenation
 
 class TensorCloud:
     @staticmethod
-    def product(first, second, concat, pred = lambda x, y: True):
+    def product(first, second, concat, pred = lambda x, y: True, key_combiner=lambda x, y: (x, y)):
         return TensorCloud({
-            (k1, k2) : concat(v1, v2)
+            key_combiner(k1, k2) : concat(v1, v2)
                 for k1, v1 in first
                 for k2, v2 in second
                     if pred(k1, k2)
