@@ -98,9 +98,22 @@ class ConvNetwork(LayeredNetwork):
                                              stride=stride))
         super().__init__(name, *parameters)
 
-def flatten(arg):
-    first, *rest = (x.value for x in arg.shape)
-    return tf.reshape(arg, [first if first is not None else -1, reduce(mul, rest)])
+class EmptyComponent(Component):
+    def __init__(self):
+        super().__init__()
+    def initialize(self, sess):
+        pass
+    def read(self, sess, values):
+        pass
+    def write(self, sess):
+        pass
+    def __repr__(self):
+        return f"{type(self)}()"
+
+class Flatten(EmptyComponent):
+    def __call__(self, arg):
+        first, *rest = (x.value for x in arg.shape)
+        return tf.reshape(arg, [first if first is not None else -1, reduce(mul, rest)])
 
 class ImageNetwork(LayeredNetwork):
     def __init__(self, name, in_width, in_height, filter_size, channel_sizes, output_channels, stride, hidden_layers, hidden_size):
@@ -109,7 +122,7 @@ class ImageNetwork(LayeredNetwork):
                              in_width=in_width, in_height=in_height,
                              channel_sizes=channel_sizes, output_channels=output_channels, stride=stride)
         fc = lambda: FCNetwork("fc", in_width * in_height * output_channels, hidden_layers, hidden_size)
-        super().__init__(name, conv, lambda: flatten, fc)
+        super().__init__(name, conv, Flatten, fc)
 
 class Concatenation(Component):
     def __init__(self, name):

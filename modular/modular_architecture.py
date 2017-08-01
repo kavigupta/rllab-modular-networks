@@ -36,11 +36,12 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
     protocol_to_linker = lru_cache(None)(lambda links: FCNetwork(
             f"protocol_to_{links}linker", hidden_size + 2 * (links + 1), hidden_layers, 1 + links)
     )
-    def reshape_into_image(arg):
-        return tf.reshape(arg, [-1, image_width, image_height, 3])
+    class ReshapeIntoImage(EmptyComponent):
+        def __call__(self, arg):
+            return tf.reshape(arg, [-1, image_width, image_height, 3])
     protocol_to_end_delta = LayeredNetwork("protocol_to_end_delta",
                                            lambda: FCNetwork("protocol_to_end_delta", hidden_size, hidden_layers, image_width * image_height * 3),
-                                           lambda: reshape_into_image)
+                                           ReshapeIntoImage)
     state = TensorCloud.input(len(COLORS) * DIMENSIONS, "block_locations")
     joint_angles = TensorCloud({links : input_tensor(2 * (links + 1), "joint_angles_%s" % links) for links in (3, 4, 5)})
     images = TensorCloud.input([image_width, image_height, 3], "images")
