@@ -16,8 +16,9 @@ import rllab.misc.logger as logger
 from rllab.envs.mujoco.arm_env import COLORS, ALL_CONDITIONS
 
 parser = ArgumentParser()
-parser.add_argument('batch_size', type=str,
-                    help='size of the batch, in units of 10k')
+parser.add_argument('batch_sizes', type=str, help='sizes of the batch, in units of 10k')
+parser.add_argument('path_lengths', type=str, help='path lengths')
+parser.add_argument('step_sizes', type=str, help='step sizes')
 args = parser.parse_args(sys.argv[1:])
 
 def run_task(env, max_path_length=150, n_itr=100, step_size=1e-3, batch_size=10**4):
@@ -36,7 +37,10 @@ def run_task(env, max_path_length=150, n_itr=100, step_size=1e-3, batch_size=10*
     )
     algo.train()
 
-environments = [env
+environments = [(env, dict(batch_size=int(batch_size * 1e4), max_path_length=int(max_path_length), n_itr=100, step_size=float(step_size)))
+                    for batch_size in eval(args.batch_sizes)
+                    for max_path_length in eval(args.path_lengths)
+                    for step_size in eval(args.step_sizes)
                     for cls in (ReachEnv,)
                     for condition in range(len(ALL_CONDITIONS))
                     for num_links in (3, 4, 5)
@@ -46,19 +50,19 @@ np.random.shuffle(environments)
 
 already_run = subprocess.run("ls data/local/experiment | cat", shell=True, stdout=subprocess.PIPE).stdout.decode().split('\n')
 
-def run_exp(env):
+def run_exp(env, **kwargs):
     env = env()
-    exp_name = f"trpo_{env}_{args.batch_size}"
+    exp_name = f"hypersearch_{env}_" + "_".join(sorted(f"{k}_{v}" for k, v in kwargs.items()))
     if exp_name in already_run:
         print("Skip %s" % exp_name)
         return
     run_experiment_lite(
-        lambda *_: run_task(env, batch_size=int(float(args.batch_size) * 10**4)),
+        lambda *_: run_task(env, **kwargs),
         n_parallel=10,
         snapshot_mode="last",
         exp_name=exp_name,
         seed=1
     )
 
-for env in environments:
-    run_exp(env)
+for env, kwargs in environments:
+    run_exp(env, **kwargs)
