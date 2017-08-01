@@ -9,7 +9,7 @@ RGB = {
     "red" : [1, 0, 0],
     "green" : [0, 1, 0],
     "yellow" : [1, 1, 0],
-    "black" : [0, 0, 1]
+    "blue" : [0, 0, 1]
 }
 
 def comment_before(is_3d):
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         for links in 3, 4, 5:
             for is_push in True, False:
                 xml = values(arm_joints(is_3d=is_3d, links=links), [block(color, movable=is_push, is_solid=is_push, location=[0, 0, 0])
-                                for color in ("red", "green", "yellow", "black")])
+                                for color in ("red", "green", "yellow", "blue")])
                 location = mujoco_xml(links, is_push, is_3d)
                 with open(location, "w") as f:
                     f.write(xml)

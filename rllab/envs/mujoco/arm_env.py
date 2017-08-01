@@ -10,7 +10,7 @@ import numpy as np
 import math
 from itertools import permutations
 
-COLORS = "red", "green", "yellow", "black"
+COLORS = "red", "green", "yellow", "blue"
 ALL_BLOCK_LOCATIONS = [[-0.4 + 0.7 * np.cos(theta), 0, -0.2 + 0.7 * np.sin(theta)] for theta in (-1.5, -1, -0.5, 0.5, 1, 1.5)]
 ALL_CONDITIONS = [dict(zip(COLORS, x)) for x in permutations(ALL_BLOCK_LOCATIONS, 4)]
 
