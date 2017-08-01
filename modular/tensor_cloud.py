@@ -2,7 +2,7 @@
 import tensorflow as tf
 import numpy as np
 
-from component import Concatenation
+from modular.component import Concatenation
 
 class TensorCloud:
     @staticmethod

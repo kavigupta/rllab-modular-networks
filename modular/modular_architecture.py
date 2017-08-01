@@ -1,6 +1,6 @@
 
-from component import FCNetwork, ImageNetwork, LayeredNetwork, Concatenation, Addition
-from tensor_cloud import input_tensor, TensorCloud
+from modular.component import FCNetwork, ImageNetwork, LayeredNetwork, Concatenation, Addition, Loss, EmptyComponent
+from modular.tensor_cloud import input_tensor, TensorCloud
 
 from functools import lru_cache
 import numpy as np
