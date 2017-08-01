@@ -132,8 +132,9 @@ class Concatenation(Component):
         with tf.name_scope(self.name) as scope:
             self.scope = scope
     def run(self, first, second):
-        shaped_second = tf.tile(second, [tf.shape(first)[0], 1])
-        return tf.concat([first, shaped_second], axis=1)
+        if second.shape[0].value is not None:
+            second = tf.tile(second, [tf.shape(first)[0], 1])
+        return tf.concat([first, second], axis=1)
 
 class Addition(Component):
     def __init__(self, name):
