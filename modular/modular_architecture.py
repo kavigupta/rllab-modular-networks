@@ -1,4 +1,6 @@
 
+from collections import namedtuple
+
 from modular.component import FCNetwork, ImageNetwork, LayeredNetwork, Concatenation, Addition, Loss, EmptyComponent
 from modular.tensor_cloud import input_tensor, TensorCloud
 
@@ -61,4 +63,15 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
         key_combiner = lambda x, y: y
         loss_joint = TensorCloud.product(label_joint, output, Loss("loss_joint"), pred, key_combiner)
         loss_image = TensorCloud.product(label_end_image, end_image, Loss("loss_image"))
-    return (images, state, joint_angles), (output, end_image), (label_joint, label_end_image), (loss_joint, loss_image)
+    return DAGArchitecture(Inputs(images, state, joint_angles),
+                           Outputs(output, end_image),
+                           Labels(label_joint, label_end_image),
+                           Losses(loss_joint, loss_image),
+                           Intermediates(features, protocol))
+
+Inputs = namedtuple('Inputs', ['obs_image', 'block_locations', 'joint_angles'])
+Outputs = namedtuple('Outputs', ['action', 'end_image'])
+Labels = namedtuple('Labels', ['action', 'end_image'])
+Losses = namedtuple('Losses', ['action', 'end_image'])
+Intermediates = namedtuple('Intermediates', ['features', 'protocol'])
+DAGArchitecture = namedtuple('DAGArchitecture', ['input', 'output', 'label', 'loss', 'intermediates'])
