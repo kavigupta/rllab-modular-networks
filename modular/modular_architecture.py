@@ -48,7 +48,7 @@ def construct_network(hidden_size, number_layers, conv_size, n_conv_layers, imag
     label_joint = TensorCloud({links : input_tensor(links + 1, f"labels_joint_angles_{links}") for links in (3, 4, 5)})
     label_end_image = TensorCloud.input([image_width, image_height, 3], "label_last_image")
     constant_features = constant_by_color | image_to_features
-    features = (images | image_to_features).label("state") + (state | state_to_features).label("images")
+    features = (images | image_to_features).label("images") + (state | state_to_features).label("state")
     color_locs = TensorCloud.product(features, constant_features, Concatenation("features_with_image_label")) | features_to_color
     reach_protocol = color_locs | reacher_to_protocol
     push_protocol = TensorCloud.product(color_locs, color_locs, Concatenation("concat_push"), lambda x, y: x < y) | pusher_to_protocol
