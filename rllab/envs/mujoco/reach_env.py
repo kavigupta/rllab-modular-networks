@@ -37,4 +37,4 @@ class ReachEnv(ArmEnv):
 
     @property
     def description(self):
-        return f"color_reach_{self.reach_block}"
+        return "color_reach_{reach_block}".format(reach_block=self.reach_block)

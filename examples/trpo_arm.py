@@ -52,7 +52,7 @@ already_run = subprocess.run("ls data/local/experiment | cat", shell=True, stdou
 
 def run_exp(env, **kwargs):
     env = env()
-    exp_name = f"hypersearch_{env}_" + "_".join(sorted(f"{k}_{v}" for k, v in kwargs.items()))
+    exp_name = "hypersearch_{env}_".format(env=env) + "_".join(sorted("{k}_{v}".format(k=k,v=v) for k, v in kwargs.items()))
     if exp_name in already_run:
         print("Skip %s" % exp_name)
         return

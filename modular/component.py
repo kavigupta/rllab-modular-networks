@@ -24,7 +24,7 @@ class Component:
                 self.inputs_outputs[args] = self.run(*args)
             return self.inputs_outputs[args]
     def __repr__(self):
-        return f"<Component {type(self).__name__} {self.parameters}>"
+        return "<Component {type(self).__name__} {parameters}>".format(parameters=self.parameters)
 
 class Var(Component):
     def __init__(self, variable):
@@ -37,7 +37,7 @@ class Var(Component):
     def write(self, sess):
         yield (self.variable.name, sess.run(self.variable))
     def __repr__(self):
-        return f"<Var {self.variable}>"
+        return "<Var {variable}>".format(variable=self.variable)
 
 def gen_variable(*dims):
     return tf.random_normal(dims, stddev=0.01)
@@ -116,7 +116,7 @@ class EmptyComponent(Component):
     def write(self, sess):
         pass
     def __repr__(self):
-        return f"{type(self)}()"
+        return str(type(self)) + "()"
 
 class Flatten(EmptyComponent):
     def __call__(self, arg):

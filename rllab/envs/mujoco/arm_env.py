@@ -99,4 +99,4 @@ class ArmEnv(MujocoEnv, Serializable):
         logger.record_tabular('StdForwardProgress', np.std(progs))
 
     def __str__(self):
-        return f"{self.number_links}_{self.description}_{self.condition}"
+        return "_".join(str(x) for x in (self.number_links, self.description, self.condition))
